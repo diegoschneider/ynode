@@ -1,0 +1,11 @@
+dist
+node_modules
+pnpm-lock.yaml
+*.db
+.env
+.env.*
+media
+*.gif
+*.svg
+build
+coverage

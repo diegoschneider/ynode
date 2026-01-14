@@ -1,0 +1,54 @@
+{
+  "name": "ynode-server",
+  "version": "2.0.0",
+  "description": "Backend server for ynode workflow automation",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest"
+  },
+  "keywords": [
+    "workflow",
+    "automation",
+    "api"
+  ],
+  "author": "",
+  "license": "AGPL-3.0",
+  "type": "module",
+  "dependencies": {
+    "@ynode/core": "workspace:*",
+    "argon2": "^0.44.0",
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.6.0",
+    "cors": "^2.8.5",
+    "dockerode": "^4.0.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0",
+    "ws": "^8.19.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/dockerode": "^3.3.35",
+    "@types/express": "^5.0.6",
+    "@types/hpp": "^0.2.7",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^25.0.6",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.18.1",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.1.4"
+  }
+}

@@ -1,0 +1,4 @@
+packages:
+  - 'packages/*'
+  - 'ynode-app'
+  - 'ynode-server'

@@ -1,0 +1,370 @@
+import { useMemo } from 'react';
+import type { NodeDefinition } from '@ynode/core';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+
+/**
+ * Field types that can be inferred from Zod schemas
+ */
+type FieldType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'enum'
+  | 'object'
+  | 'array'
+  | 'unknown';
+
+interface FieldConfig {
+  name: string;
+  label: string;
+  type: FieldType;
+  description?: string;
+  required?: boolean;
+  default?: unknown;
+  enumValues?: string[];
+  min?: number;
+  max?: number;
+  placeholder?: string;
+}
+
+/**
+ * Infer field configurations from a Zod schema
+ * This is a simplified parser - it handles common cases
+ */
+function inferFieldsFromSchema(schema: any): FieldConfig[] {
+  if (!schema || !schema._def) return [];
+
+  const fields: FieldConfig[] = [];
+
+  // Handle ZodObject
+  if (schema._def.typeName === 'ZodObject') {
+    const shape = schema._def.shape();
+    for (const [key, fieldSchema] of Object.entries(shape)) {
+      const field = parseZodField(key, fieldSchema);
+      if (field) fields.push(field);
+    }
+  }
+
+  return fields;
+}
+
+/**
+ * Parse a single Zod field to extract its configuration
+ */
+function parseZodField(name: string, schema: any): FieldConfig | null {
+  if (!schema || !schema._def) return null;
+
+  let currentSchema = schema;
+  let isOptional = false;
+  let defaultValue: unknown = undefined;
+
+  // Unwrap ZodDefault
+  while (currentSchema._def.typeName === 'ZodDefault') {
+    defaultValue = currentSchema._def.defaultValue();
+    currentSchema = currentSchema._def.innerType;
+  }
+
+  // Unwrap ZodOptional
+  while (currentSchema._def.typeName === 'ZodOptional') {
+    isOptional = true;
+    currentSchema = currentSchema._def.innerType;
+  }
+
+  const typeName = currentSchema._def.typeName;
+
+  // Generate human-readable label from field name
+  const label = name
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (str) => str.toUpperCase())
+    .trim();
+
+  const baseField: FieldConfig = {
+    name,
+    label,
+    type: 'unknown',
+    required: !isOptional,
+    default: defaultValue,
+  };
+
+  switch (typeName) {
+    case 'ZodString':
+      return {
+        ...baseField,
+        type: 'string',
+        placeholder: `Enter ${label.toLowerCase()}...`,
+      };
+
+    case 'ZodNumber':
+      const checks = currentSchema._def.checks || [];
+      const minCheck = checks.find((c: any) => c.kind === 'min');
+      const maxCheck = checks.find((c: any) => c.kind === 'max');
+      return {
+        ...baseField,
+        type: 'number',
+        min: minCheck?.value,
+        max: maxCheck?.value,
+      };
+
+    case 'ZodBoolean':
+      return {
+        ...baseField,
+        type: 'boolean',
+      };
+
+    case 'ZodEnum':
+      return {
+        ...baseField,
+        type: 'enum',
+        enumValues: currentSchema._def.values,
+      };
+
+    case 'ZodRecord':
+    case 'ZodObject':
+      return {
+        ...baseField,
+        type: 'object',
+        description: 'Enter as JSON',
+      };
+
+    case 'ZodArray':
+      return {
+        ...baseField,
+        type: 'array',
+        description: 'Enter as JSON array',
+      };
+
+    default:
+      return {
+        ...baseField,
+        type: 'string', // Fallback to string input
+      };
+  }
+}
+
+interface DynamicConfigPanelProps {
+  definition: NodeDefinition;
+  config: Record<string, unknown>;
+  onConfigChange: (key: string, value: unknown) => void;
+}
+
+/**
+ * DynamicConfigPanel - Automatically generates configuration UI
+ * based on the node's configSchema (Zod schema).
+ *
+ * This enables community developers to create nodes without
+ * having to write custom React components for the config panel.
+ */
+export function DynamicConfigPanel({
+  definition,
+  config,
+  onConfigChange,
+}: DynamicConfigPanelProps) {
+  const fields = useMemo(() => {
+    if (!definition.configSchema) return [];
+    return inferFieldsFromSchema(definition.configSchema);
+  }, [definition.configSchema]);
+
+  if (fields.length === 0) {
+    return (
+      <div className="text-center py-6 text-zinc-500 text-xs">
+        No configuration options available
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {fields.map((field) => (
+        <FieldRenderer
+          key={field.name}
+          field={field}
+          value={config[field.name]}
+          onChange={(value) => onConfigChange(field.name, value)}
+        />
+      ))}
+    </div>
+  );
+}
+
+interface FieldRendererProps {
+  field: FieldConfig;
+  value: unknown;
+  onChange: (value: unknown) => void;
+}
+
+/**
+ * Render a single configuration field based on its type
+ */
+function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
+  switch (field.type) {
+    case 'string':
+      return (
+        <div className="space-y-2">
+          <Label>
+            {field.label}
+            {field.required && <span className="text-red-400 ml-1">*</span>}
+          </Label>
+          <Input
+            value={(value as string) || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={field.placeholder}
+            className="bg-white/5 border-white/10"
+          />
+          {field.description && (
+            <p className="text-[10px] text-muted-foreground">
+              {field.description}
+            </p>
+          )}
+        </div>
+      );
+
+    case 'number':
+      return (
+        <div className="space-y-2">
+          <Label>
+            {field.label}
+            {field.required && <span className="text-red-400 ml-1">*</span>}
+          </Label>
+          <Input
+            type="number"
+            value={(value as number) ?? field.default ?? ''}
+            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+            min={field.min}
+            max={field.max}
+            className="bg-white/5 border-white/10 font-mono text-xs"
+          />
+          {(field.min !== undefined || field.max !== undefined) && (
+            <p className="text-[10px] text-muted-foreground">
+              {field.min !== undefined && `Min: ${field.min}`}
+              {field.min !== undefined && field.max !== undefined && ' | '}
+              {field.max !== undefined && `Max: ${field.max}`}
+            </p>
+          )}
+        </div>
+      );
+
+    case 'boolean':
+      return (
+        <div className="space-y-2">
+          <Label>
+            {field.label}
+            {field.required && <span className="text-red-400 ml-1">*</span>}
+          </Label>
+          <Select
+            value={String(value ?? field.default ?? false)}
+            onValueChange={(v) => onChange(v === 'true')}
+          >
+            <SelectTrigger className="bg-white/5 border-white/10">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-900 border-white/10">
+              <SelectItem value="true">Yes</SelectItem>
+              <SelectItem value="false">No</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      );
+
+    case 'enum':
+      return (
+        <div className="space-y-2">
+          <Label>
+            {field.label}
+            {field.required && <span className="text-red-400 ml-1">*</span>}
+          </Label>
+          <Select
+            value={
+              (value as string) ||
+              (field.default as string) ||
+              field.enumValues?.[0] ||
+              ''
+            }
+            onValueChange={onChange}
+          >
+            <SelectTrigger className="bg-white/5 border-white/10">
+              <SelectValue
+                placeholder={`Select ${field.label.toLowerCase()}`}
+              />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-900 border-white/10">
+              {field.enumValues?.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+
+    case 'object':
+    case 'array':
+      const jsonValue = value ? JSON.stringify(value, null, 2) : '';
+      return (
+        <div className="space-y-2">
+          <Label>
+            {field.label}
+            {field.required && <span className="text-red-400 ml-1">*</span>}
+          </Label>
+          <textarea
+            value={jsonValue}
+            onChange={(e) => {
+              try {
+                const parsed = JSON.parse(e.target.value);
+                onChange(parsed);
+              } catch {
+                // Keep raw string for now, validation happens on blur
+              }
+            }}
+            onBlur={(e) => {
+              try {
+                const parsed = JSON.parse(e.target.value);
+                onChange(parsed);
+              } catch {
+                // Invalid JSON - could show error
+              }
+            }}
+            placeholder={field.type === 'array' ? '[\n  \n]' : '{\n  \n}'}
+            className="w-full h-24 bg-white/5 border border-white/10 rounded-md p-2 font-mono text-xs text-white resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+          />
+          {field.description && (
+            <p className="text-[10px] text-muted-foreground">
+              {field.description}
+            </p>
+          )}
+        </div>
+      );
+
+    default:
+      return (
+        <div className="space-y-2">
+          <Label>
+            {field.label}
+            {field.required && <span className="text-red-400 ml-1">*</span>}
+          </Label>
+          <Input
+            value={String(value ?? '')}
+            onChange={(e) => onChange(e.target.value)}
+            className="bg-white/5 border-white/10"
+          />
+        </div>
+      );
+  }
+}
+
+/**
+ * Check if a node type has a custom (hardcoded) config panel
+ */
+export function hasCustomConfigPanel(nodeType: string): boolean {
+  // List of node types that have custom config panels in NodeConfig.tsx
+  const customPanelTypes = ['httpRequest', 'ifElse', 'trigger'];
+  return customPanelTypes.includes(nodeType);
+}
