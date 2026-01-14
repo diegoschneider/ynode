@@ -339,13 +339,47 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
       >
         <ExecutionBadge state={nodeData.executionState} />
 
-        {/* Input handle */}
+        {/* Input handle(s) */}
         {hasInputs && (
-          <CustomHandle
-            type="target"
-            position={Position.Left}
-            className={`!${colors.border.replace('border-l-', 'border-')}`}
-          />
+          <>
+            {nodeDef.inputs.length === 1 ? (
+              <CustomHandle
+                type="target"
+                position={Position.Left}
+                id={nodeDef.inputs[0].id}
+                className={`!${colors.border.replace('border-l-', 'border-')}`}
+              />
+            ) : (
+              // Multiple inputs - render each with label
+              <div className="flex flex-col gap-2 px-3 pt-3">
+                {nodeDef.inputs.map((input) => (
+                  <div
+                    key={input.id}
+                    className="relative flex items-center h-7 bg-white/5 rounded-md border border-white/10 pl-3"
+                  >
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {input.label}
+                      {input.required && <span className="text-red-400 ml-0.5">*</span>}
+                    </span>
+                    <Handle
+                      type="target"
+                      position={Position.Left}
+                      id={input.id}
+                      style={{
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        left: '-7px',
+                      }}
+                      className={cn(
+                        '!w-3 !h-3 !border-2 !border-background',
+                        colors.bg.replace('/10', '')
+                      )}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Node content */}
