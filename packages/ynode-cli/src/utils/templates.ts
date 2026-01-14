@@ -79,8 +79,9 @@ import { defineNode } from '@ynode/core'
 import type { ExecutionContext, NodeOutput } from '@ynode/core'
 
 const configSchema = z.object({
+    // Credential ID selected by user in UI
+    credentialId: z.string().default(''),
     // Add your configuration options here
-    endpoint: z.string().default(''),
 })
 
 type ${name}Config = z.infer<typeof configSchema>
@@ -90,22 +91,22 @@ export const ${className}Node = defineNode<${name}Config>({
     label: '${name}',
     description: 'Integration node for ${name}',
     category: '${category}',
-    icon: 'Plug', // Use Lucide icon name
+    icon: 'Plug',
 
     inputs: [
         {
-            id: 'data',
-            label: 'Data',
+            id: 'trigger',
+            label: 'Trigger',
             type: 'any',
             required: true,
-            description: 'Data to process',
+            description: 'Incoming data',
         },
     ],
 
     outputs: [
         {
-            id: 'response',
-            label: 'Response',
+            id: 'result',
+            label: 'Result',
             type: 'object',
             description: 'API response',
         },
@@ -113,16 +114,16 @@ export const ${className}Node = defineNode<${name}Config>({
             id: 'error',
             label: 'Error',
             type: 'object',
-            description: 'Error information if request failed',
+            description: 'Error if failed',
         },
     ],
 
     configSchema,
     defaultConfig: {
-        endpoint: '',
+        credentialId: '',
     },
 
-    // Declare credential requirements
+    // Declare what credential type this node needs
     credentials: [
         {
             type: '${nodeType}',
@@ -136,24 +137,37 @@ export const ${className}Node = defineNode<${name}Config>({
     async execute(ctx: ExecutionContext<${name}Config>): Promise<NodeOutput> {
         const { config, inputs, log, credentials } = ctx
 
-        log(\`Executing ${name} integration\`)
+        // Validate credential is configured
+        if (!config.credentialId) {
+            return {
+                data: { error: { message: 'No credential configured' } },
+                error: new Error('No credential configured'),
+            }
+        }
 
         try {
-            // Get credentials
-            const creds = await credentials.get('credential_${nodeType}')
-            
-            // Your integration logic here
-            log(\`Connecting to: \${config.endpoint}\`)
+            // Get the stored credential (apiKey, token, etc.)
+            const creds = await credentials.get(config.credentialId)
+            log(\`Using credential: \${config.credentialId}\`)
+
+            // ============================================
+            // YOUR INTEGRATION LOGIC HERE
+            // ============================================
+            // Example: Make API call with creds.apiKey
+            // const response = await fetch('https://api.example.com', {
+            //     headers: { 'Authorization': \`Bearer \${creds.apiKey}\` }
+            // })
+            // ============================================
 
             const result = {
                 success: true,
-                data: inputs.data,
+                input: inputs.trigger,
             }
 
             return {
                 data: {
                     default: result,
-                    response: result,
+                    result: result,
                 },
             }
         } catch (error) {
