@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { NodeDefinition } from '@ynode/core';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { fetchCredentials, type Credential } from '../../api/credentialsApi';
 
 /**
  * Field types that can be inferred from Zod schemas
@@ -200,10 +201,17 @@ interface FieldRendererProps {
   onChange: (value: unknown) => void;
 }
 
-/**
- * Render a single configuration field based on its type
- */
 function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
+  if (field.name === 'credentialId') {
+    return (
+      <CredentialPicker
+        value={(value as string) || ''}
+        onChange={onChange}
+        required={field.required}
+      />
+    );
+  }
+
   switch (field.type) {
     case 'string':
       return (
@@ -360,11 +368,57 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
   }
 }
 
-/**
- * Check if a node type has a custom (hardcoded) config panel
- */
+interface CredentialPickerProps {
+  value: string;
+  onChange: (value: unknown) => void;
+  required?: boolean;
+}
+
+function CredentialPicker({ value, onChange, required }: CredentialPickerProps) {
+  const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCredentials()
+      .then(setCredentials)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      <Label>
+        Credential
+        {required && <span className="text-red-400 ml-1">*</span>}
+      </Label>
+      <Select value={value || ''} onValueChange={(v) => onChange(v)}>
+        <SelectTrigger className="bg-white/5 border-white/10">
+          <SelectValue placeholder={loading ? 'Loading...' : 'Select credential'} />
+        </SelectTrigger>
+        <SelectContent className="bg-zinc-900 border-white/10">
+          {credentials.length === 0 && !loading && (
+            <div className="px-2 py-1.5 text-xs text-zinc-500">
+              No credentials found. Add one in Settings.
+            </div>
+          )}
+          {credentials.map((cred) => (
+            <SelectItem key={cred.id} value={cred.id}>
+              <span className="flex items-center gap-2">
+                <span>{cred.name}</span>
+                <span className="text-xs text-zinc-500">({cred.type})</span>
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <p className="text-[10px] text-muted-foreground">
+        Manage credentials in Settings → Credentials
+      </p>
+    </div>
+  );
+}
+
 export function hasCustomConfigPanel(nodeType: string): boolean {
-  // List of node types that have custom config panels in NodeConfig.tsx
   const customPanelTypes = ['httpRequest', 'ifElse', 'trigger'];
   return customPanelTypes.includes(nodeType);
 }
