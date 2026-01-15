@@ -167,6 +167,15 @@ importers:
         specifier: ^4.0.16
         version: 4.0.17(@types/node@24.10.8)(jiti@1.21.7)(jsdom@27.4.0)(terser@5.44.1)(tsx@4.21.0)
 
+  ynode-nodes:
+    dependencies:
+      '@ynode/core':
+        specifier: workspace:*
+        version: link:../packages/ynode-core
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+
   ynode-server:
     dependencies:
       '@ynode/core':
