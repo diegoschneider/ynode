@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Workflow, Search, Plus, Calendar, ArrowRight } from 'lucide-react';
+import { Workflow, Search, Plus, Calendar, ArrowRight, Trash2 } from 'lucide-react';
 import { useWorkflowDataStore } from '@/store/workflowDataStore';
 import { formatDistanceToNow } from 'date-fns';
 
 export function Workflows() {
-  const { workflows, workflowsLoading, fetchAllWorkflows } =
+  const { workflows, workflowsLoading, fetchAllWorkflows, deleteWorkflow } =
     useWorkflowDataStore();
   const [search, setSearch] = useState('');
 
@@ -83,22 +83,35 @@ export function Workflows() {
             >
               <div className="flex items-start justify-between mb-6">
                 <div
-                  className={`p-3.5 rounded-xl border ${
-                    workflow.isActive
-                      ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_15px_-3px_theme(colors.green.500/0.3)]'
-                      : 'bg-zinc-800/50 text-zinc-500 border-white/5'
-                  }`}
+                  className={`p-3.5 rounded-xl border ${workflow.isActive
+                    ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_15px_-3px_theme(colors.green.500/0.3)]'
+                    : 'bg-zinc-800/50 text-zinc-500 border-white/5'
+                    }`}
                 >
                   <Workflow className="h-6 w-6" />
                 </div>
-                <div
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider border ${
-                    workflow.isActive
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider border ${workflow.isActive
                       ? 'bg-green-500/10 text-green-400 border-green-500/20'
                       : 'bg-zinc-800/50 text-zinc-500 border-white/5'
-                  }`}
-                >
-                  {workflow.isActive ? 'Active' : 'Inactive'}
+                      }`}
+                  >
+                    {workflow.isActive ? 'Active' : 'Inactive'}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (confirm('Are you sure you want to delete this workflow?')) {
+                        deleteWorkflow(workflow.id);
+                      }
+                    }}
+                    className="p-2 ml-2 text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Delete Workflow"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
 
@@ -116,8 +129,8 @@ export function Workflows() {
                   <Calendar className="h-3 w-3" />
                   {workflow.updatedAt
                     ? formatDistanceToNow(new Date(workflow.updatedAt), {
-                        addSuffix: true,
-                      })
+                      addSuffix: true,
+                    })
                     : 'Just now'}
                 </span>
 

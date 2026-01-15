@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   fetchWorkflows,
   fetchWorkflow,
+  deleteWorkflow,
   type Workflow,
 } from '../api/workflowApi';
 
@@ -16,6 +17,7 @@ interface WorkflowDataState {
   fetchAllWorkflows: (force?: boolean) => Promise<void>;
   fetchWorkflowById: (id: string, force?: boolean) => Promise<Workflow | null>;
   getWorkflowById: (id: string) => Workflow | undefined;
+  deleteWorkflow: (id: string) => Promise<void>;
   invalidateWorkflows: () => void;
   updateWorkflowInCache: (workflow: Workflow) => void;
 }
@@ -89,6 +91,25 @@ export const useWorkflowDataStore = create<WorkflowDataState>((set, get) => ({
 
   getWorkflowById: (id: string) => {
     return get().workflowCache.get(id);
+  },
+
+  deleteWorkflow: async (id: string) => {
+    try {
+      await deleteWorkflow(id);
+
+      const { workflows, workflowCache } = get();
+
+      const cache = new Map(workflowCache);
+      cache.delete(id);
+
+      set({
+        workflows: workflows.filter(w => w.id !== id),
+        workflowCache: cache
+      });
+    } catch (error) {
+      console.error('Failed to delete workflow:', error);
+      throw error;
+    }
   },
 
   invalidateWorkflows: () => {

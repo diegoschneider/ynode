@@ -108,7 +108,7 @@ export function getWorkflowsByUserId(userId: string) {
     .prepare(
       `
         SELECT * FROM workflows 
-        WHERE user_id = ? AND is_deleted = 0
+        WHERE user_id = ?
         ORDER BY updated_at DESC
     `
     )
@@ -119,7 +119,7 @@ export function getWorkflowById(id: string) {
   return db
     .prepare(
       `
-        SELECT * FROM workflows WHERE id = ? AND is_deleted = 0
+        SELECT * FROM workflows WHERE id = ?
     `
     )
     .get(id);
@@ -178,14 +178,10 @@ export function deleteWorkflow(id: string) {
   return db
     .prepare(
       `
-        UPDATE workflows SET 
-            is_deleted = 1, 
-            deleted_at = ?,
-            updated_at = ?
-        WHERE id = ?
+        DELETE FROM workflows WHERE id = ?
     `
     )
-    .run(new Date().toISOString(), new Date().toISOString(), id);
+    .run(id);
 }
 
 export function countUserWorkflows(userId: string): number {
@@ -193,7 +189,7 @@ export function countUserWorkflows(userId: string): number {
     .prepare(
       `
         SELECT COUNT(*) as count FROM workflows 
-        WHERE user_id = ? AND is_deleted = 0
+        WHERE user_id = ?
     `
     )
     .get(userId) as { count: number };
