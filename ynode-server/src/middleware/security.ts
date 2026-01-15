@@ -32,7 +32,9 @@ export const helmetMiddleware = helmet({
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 });
 
-export const hppMiddleware = hpp({
+import type { RequestHandler } from 'express';
+
+export const hppMiddleware: RequestHandler = hpp({
   whitelist: ['tags', 'fields'],
 });
 
