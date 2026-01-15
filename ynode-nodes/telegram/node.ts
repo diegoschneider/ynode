@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { defineNode } from '../types/index.js';
-import type { ExecutionContext, NodeOutput } from '../types/index.js';
+import { defineNode } from '@ynode/core';
+import type { ExecutionContext, NodeOutput } from '@ynode/core';
 
 const configSchema = z.object({
     credentialId: z.string().default(''),
     chatId: z.string().default(''),
-    parseMode: z.enum(['HTML', 'Markdown', 'MarkdownV2', '']).default(''),
+    parseMode: z.enum(['none', 'HTML', 'Markdown', 'MarkdownV2']).default('none'),
 });
 
 type TelegramConfig = z.infer<typeof configSchema>;
@@ -60,7 +60,7 @@ export const telegramNode = defineNode<TelegramConfig>({
     defaultConfig: {
         credentialId: '',
         chatId: '',
-        parseMode: '',
+        parseMode: 'none',
     },
 
     credentials: [
@@ -112,7 +112,7 @@ export const telegramNode = defineNode<TelegramConfig>({
                 text: message,
             };
 
-            if (config.parseMode) {
+            if (config.parseMode && config.parseMode !== 'none') {
                 body.parse_mode = config.parseMode;
             }
 
@@ -139,12 +139,14 @@ export const telegramNode = defineNode<TelegramConfig>({
                 },
             };
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Unknown error';
-            log(`Error: ${message}`);
+            const errMsg = error instanceof Error ? error.message : 'Unknown error';
+            log(`Error: ${errMsg}`);
             return {
-                data: { error: { message } },
+                data: { error: { message: errMsg } },
                 error: error as Error,
             };
         }
     },
 });
+
+export default telegramNode;

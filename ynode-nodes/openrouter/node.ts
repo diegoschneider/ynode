@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { defineNode } from '../types/index.js';
-import type { ExecutionContext, NodeOutput } from '../types/index.js';
+import { defineNode } from '@ynode/core';
+import type { ExecutionContext, NodeOutput } from '@ynode/core';
 
 const FREE_MODELS = [
     'nvidia/nemotron-3-nano-30b-a3b:free',
@@ -183,3 +183,4 @@ export const openRouterNode = defineNode<OpenRouterConfig>({
 });
 
 export const OPENROUTER_FREE_MODELS = FREE_MODELS;
+export default openRouterNode;

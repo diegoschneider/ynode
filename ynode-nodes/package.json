@@ -1,0 +1,9 @@
+{
+    "name": "ynode-nodes",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@ynode/core": "workspace:*",
+        "zod": "^3.24.0"
+    }
+}

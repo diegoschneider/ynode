@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { defineNode } from '../types/index.js';
-import type { ExecutionContext, NodeOutput } from '../types/index.js';
+import { defineNode } from '@ynode/core';
+import type { ExecutionContext, NodeOutput } from '@ynode/core';
 
 const configSchema = z.object({
     credentialId: z.string().default(''),
@@ -147,3 +147,5 @@ export const openaiNode = defineNode<OpenAIConfig>({
         }
     },
 });
+
+export default openaiNode;

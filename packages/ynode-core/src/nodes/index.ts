@@ -12,10 +12,6 @@ import { templateNode } from './template';
 import { splitNode } from './split';
 import { setVariableNode } from './setVariable';
 import { getVariableNode } from './getVariable';
-import { openaiNode } from './openai';
-import { telegramNode } from './telegram';
-import { openRouterNode } from './open-router';
-import { textNode } from './text';
 
 export { triggerNode } from './trigger';
 export { httpRequestNode } from './httpRequest';
@@ -30,10 +26,6 @@ export { templateNode } from './template';
 export { splitNode } from './split';
 export { setVariableNode } from './setVariable';
 export { getVariableNode } from './getVariable';
-export { openaiNode } from './openai';
-export { telegramNode } from './telegram';
-export { openRouterNode, OPENROUTER_FREE_MODELS } from './open-router';
-export { textNode } from './text';
 
 export function registerBuiltinNodes(): void {
   if (nodeRegistry.has('trigger')) {
@@ -53,10 +45,6 @@ export function registerBuiltinNodes(): void {
   nodeRegistry.register(splitNode);
   nodeRegistry.register(setVariableNode);
   nodeRegistry.register(getVariableNode);
-  nodeRegistry.register(openaiNode);
-  nodeRegistry.register(telegramNode);
-  nodeRegistry.register(openRouterNode);
-  nodeRegistry.register(textNode);
 }
 
 export function getBuiltinNodes() {
@@ -74,9 +62,5 @@ export function getBuiltinNodes() {
     splitNode,
     setVariableNode,
     getVariableNode,
-    openaiNode,
-    telegramNode,
-    openRouterNode,
-    textNode,
   ];
 }

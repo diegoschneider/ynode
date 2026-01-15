@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { defineNode } from '../types/index.js';
-import type { ExecutionContext, NodeOutput } from '../types/index.js';
+import { defineNode } from '@ynode/core';
+import type { ExecutionContext, NodeOutput } from '@ynode/core';
 
 const configSchema = z.object({
     text: z.string().default(''),
@@ -53,3 +53,5 @@ export const textNode = defineNode<TextConfig>({
         };
     },
 });
+
+export default textNode;
