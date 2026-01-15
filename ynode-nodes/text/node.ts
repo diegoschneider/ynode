@@ -43,14 +43,15 @@ export const textNode = defineNode<TextConfig>({
     async execute(ctx: ExecutionContext<TextConfig>): Promise<NodeOutput> {
         const { config, log } = ctx;
 
+        const text = config.text || '';
         log(
-            `Outputting text: "${config.text.substring(0, 50)}${config.text.length > 50 ? '...' : ''}"`
+            `Outputting text: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`
         );
 
         return {
             data: {
-                default: config.text,
-                text: config.text,
+                default: text,
+                text: text,
             },
         };
     },

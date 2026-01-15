@@ -21,20 +21,35 @@ export async function loadIntegrationNodes(): Promise<void> {
     for (const folder of folders) {
         try {
             const nodePath = join(YNODE_NODES_DIR, folder, 'node.ts');
-            if (!existsSync(nodePath)) {
-                console.warn(`  Skip ${folder}: no node.ts found`);
+            const indexPath = join(YNODE_NODES_DIR, folder, 'index.ts');
+
+            let targetPath: string | null = null;
+            if (existsSync(nodePath)) {
+                targetPath = nodePath;
+            } else if (existsSync(indexPath)) {
+                targetPath = indexPath;
+            }
+
+            if (!targetPath) {
+                console.warn(`  Skip ${folder}: no node.ts or index.ts found`);
                 continue;
             }
 
-            const { default: node } = await import(
-                `file://${join(YNODE_NODES_DIR, folder, 'node.ts')}`
-            );
+            const module = await import(`file://${targetPath}`);
 
-            if (node && typeof node === 'object' && 'type' in node) {
-                nodeRegistry.register(node);
-                console.log(`  ✓ Loaded ${node.type}`);
-            } else {
-                console.warn(`  Skip ${folder}: invalid export`);
+            const exports = module.default ? [module.default] : Object.values(module);
+
+            let loadedCount = 0;
+            for (const node of exports) {
+                if (node && typeof node === 'object' && 'type' in node) {
+                    nodeRegistry.register(node);
+                    console.log(`  ✓ Loaded ${node.type}`);
+                    loadedCount++;
+                }
+            }
+
+            if (loadedCount === 0) {
+                console.warn(`  Skip ${folder}: no valid nodes exported`);
             }
         } catch (err) {
             console.error(`  ✗ Failed to load ${folder}:`, err);

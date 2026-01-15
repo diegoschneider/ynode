@@ -333,7 +333,7 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
       <div className="group relative">
         <Card className="min-w-[200px] border-l-4 border-l-red-500 bg-card p-4">
           <span className="text-sm text-red-400">
-            Unknown node type: {type}
+            Unknown node type: {type || 'undefined'}
           </span>
         </Card>
       </div>

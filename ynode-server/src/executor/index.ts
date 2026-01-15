@@ -279,8 +279,14 @@ export async function executeWorkflow(
           const sourceHandle = edge.sourceHandle || 'default';
           const targetHandle = edge.targetHandle || 'trigger';
           const outputData =
-            sourceOutput.data[sourceHandle] ?? sourceOutput.data;
+            sourceOutput.data[sourceHandle] ?? sourceOutput.data.default ?? sourceOutput.data;
+
           inputs[targetHandle] = outputData;
+
+          if (!inputs.default) {
+            inputs.default = outputData;
+          }
+
           if (typeof outputData === 'object' && outputData !== null) {
             Object.assign(inputs, outputData);
           }

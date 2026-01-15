@@ -93,7 +93,19 @@ interface WorkflowState {
   deleteComment: (commentId: string) => void;
 }
 
+import { useNodeTypesStore } from './nodeTypesStore';
+
 const getDefaultNodeData = (type: string): NodeData => {
+  const storeNode = useNodeTypesStore.getState().nodes.find(n => n.type === type);
+
+  if (storeNode) {
+    return {
+      type: storeNode.type,
+      label: storeNode.label,
+      config: { ...storeNode.defaultConfig },
+    };
+  }
+
   const definition = nodeRegistry.get(type);
 
   if (definition) {

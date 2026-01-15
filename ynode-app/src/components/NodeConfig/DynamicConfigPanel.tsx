@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { fetchCredentials, type Credential } from '../../api/credentialsApi';
+import { MonacoCodeEditor } from './MonacoCodeEditor';
 
 /**
  * Field types that can be inferred from Zod schemas
@@ -219,6 +220,7 @@ export function DynamicConfigPanel({
           field={field}
           value={config[field.name]}
           onChange={(value) => onConfigChange(field.name, value)}
+          config={config}
         />
       ))}
     </div>
@@ -229,9 +231,26 @@ interface FieldRendererProps {
   field: FieldConfig;
   value: unknown;
   onChange: (value: unknown) => void;
+  config: Record<string, unknown>;
 }
 
-function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
+function FieldRenderer({ field, value, onChange, config }: FieldRendererProps) {
+  // Special handling for code field - use Monaco Editor
+  if (field.name === 'code') {
+    const language = (config.language as string) || 'javascript';
+    return (
+      <MonacoCodeEditor
+        value={(value as string) || ''}
+        onChange={onChange}
+        language={language}
+        label={field.label}
+        required={field.required}
+        description="Available: $input, inputs, outputs, memory, workflowMemory"
+        height="400px"
+      />
+    );
+  }
+
   if (field.name === 'credentialId') {
     return (
       <CredentialPicker
