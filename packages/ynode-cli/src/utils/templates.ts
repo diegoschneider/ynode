@@ -8,6 +8,15 @@ export function getBasicNodeTemplate(
 import { defineNode } from '@ynode/core';
 import type { ExecutionContext, NodeOutput } from '@ynode/core';
 
+/**
+ * Available Port Types:
+ * - Primitives: 'string' | 'number' | 'boolean' | 'null'
+ * - Structured: 'object' | 'array' | 'json'
+ * - Format: 'datetime' | 'date' | 'time' | 'uuid' | 'url' | 'email' | 'regex' | 'base64' | 'markdown' | 'html' | 'xml' | 'yaml' | 'csv'
+ * - Binary: 'binary' | 'image' | 'audio' | 'video' | 'pdf'
+ * - Special: 'any' | 'trigger'
+ */
+
 const configSchema = z.object({
     exampleOption: z.string().default('default value'),
 });
@@ -25,18 +34,24 @@ export const ${className}Node = defineNode<${name}Config>({
         {
             id: 'trigger',
             label: 'Trigger',
-            type: 'any',
+            type: 'trigger',  // Use 'trigger' for flow control, or specific types like 'string', 'object'
             required: true,
-            description: 'Input data',
+            description: 'Triggers execution',
+        },
+        {
+            id: 'data',
+            label: 'Data',
+            type: 'string',  // Specify the expected input type
+            description: 'Input data to process',
         },
     ],
 
     outputs: [
         {
-            id: 'output',
-            label: 'Output',
-            type: 'any',
-            description: 'Output data',
+            id: 'result',
+            label: 'Result',
+            type: 'object',  // Specify output type for connection validation
+            description: 'Processed result',
         },
     ],
 
@@ -52,14 +67,14 @@ export const ${className}Node = defineNode<${name}Config>({
 
         const result = {
             processed: true,
-            input: inputs.trigger,
+            input: inputs.data,
             option: config.exampleOption,
         };
 
         return {
             data: {
                 default: result,
-                output: result,
+                result: result,
             },
         };
     },
@@ -79,6 +94,15 @@ export function getIntegrationNodeTemplate(
 import { defineNode } from '@ynode/core';
 import type { ExecutionContext, NodeOutput } from '@ynode/core';
 
+/**
+ * Available Port Types:
+ * - Primitives: 'string' | 'number' | 'boolean' | 'null'
+ * - Structured: 'object' | 'array' | 'json'
+ * - Format: 'datetime' | 'date' | 'time' | 'uuid' | 'url' | 'email' | 'regex' | 'base64' | 'markdown' | 'html' | 'xml' | 'yaml' | 'csv'
+ * - Binary: 'binary' | 'image' | 'audio' | 'video' | 'pdf'
+ * - Special: 'any' | 'trigger'
+ */
+
 const configSchema = z.object({
     credentialId: z.string().default(''),
 });
@@ -96,24 +120,36 @@ export const ${className}Node = defineNode<${name}Config>({
         {
             id: 'trigger',
             label: 'Trigger',
-            type: 'any',
+            type: 'trigger',  // Flow trigger
             required: true,
-            description: 'Incoming data',
+            description: 'Triggers API call',
+        },
+        {
+            id: 'payload',
+            label: 'Payload',
+            type: 'json',  // Expects JSON data
+            description: 'Request payload',
         },
     ],
 
     outputs: [
         {
-            id: 'result',
-            label: 'Result',
-            type: 'object',
-            description: 'API response',
+            id: 'response',
+            label: 'Response',
+            type: 'json',  // API returns JSON
+            description: 'Full API response',
+        },
+        {
+            id: 'data',
+            label: 'Data',
+            type: 'object',  // Parsed data object
+            description: 'Response data',
         },
         {
             id: 'error',
             label: 'Error',
             type: 'object',
-            description: 'Error if failed',
+            description: 'Error if request failed',
         },
     ],
 
@@ -147,16 +183,19 @@ export const ${className}Node = defineNode<${name}Config>({
             log(\`Using credential: \${config.credentialId}\`);
 
             // YOUR INTEGRATION LOGIC HERE
+            // const response = await fetch('https://api.example.com', { ... });
+            // const data = await response.json();
 
             const result = {
                 success: true,
-                input: inputs.trigger,
+                payload: inputs.payload,
             };
 
             return {
                 data: {
                     default: result,
-                    result: result,
+                    response: result,
+                    data: result,
                 },
             };
         } catch (error) {
