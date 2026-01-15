@@ -1,7 +1,8 @@
 import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow } from '@xyflow/react';
 import type { NodeProps } from '@xyflow/react';
-import type { NodeData, NodeStatus } from '@ynode/core';
+import type { NodeData, NodeStatus, PortDataType } from '@ynode/core';
+import { getTypeColor } from '@ynode/core';
 import {
   Zap,
   Globe,
@@ -175,18 +176,44 @@ const NodeToolbar = ({ nodeId, selected }: NodeToolbarProps) => {
   );
 };
 
-const CustomHandle = ({ type, position, id, className, style }: any) => (
-  <Handle
-    type={type}
-    position={position}
-    id={id}
-    style={style}
-    className={cn(
-      '!w-3 !h-3 !bg-background !border-2 !border-primary',
-      className
-    )}
-  />
-);
+// Custom handle component with type-based colors
+interface CustomHandleProps {
+  type: 'source' | 'target';
+  position: Position;
+  id?: string;
+  portType?: PortDataType;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const CustomHandle = ({
+  type,
+  position,
+  id,
+  portType = 'any',
+  className,
+  style,
+}: CustomHandleProps) => {
+  const typeColor = getTypeColor(portType);
+
+  return (
+    <Handle
+      type={type}
+      position={position}
+      id={id}
+      style={{
+        ...style,
+        backgroundColor: typeColor,
+        borderColor: typeColor,
+      }}
+      className={cn(
+        '!w-3 !h-3 !border-2',
+        '!shadow-[0_0_6px_currentColor]',
+        className
+      )}
+    />
+  );
+};
 
 export const TriggerNode = memo(({ data, selected, id }: NodeProps) => {
   const nodeData = data as ExtendedNodeData;
@@ -230,7 +257,7 @@ export const TriggerNode = memo(({ data, selected, id }: NodeProps) => {
         <CustomHandle
           type="source"
           position={Position.Right}
-          className="!border-brand-green"
+          portType="trigger"
         />
       </Card>
     </div>
@@ -259,7 +286,7 @@ export const HttpRequestNode = memo(({ data, selected, id }: NodeProps) => {
         <CustomHandle
           type="target"
           position={Position.Left}
-          className="!border-brand-cyan"
+          portType="any"
         />
         <div className="p-3 space-y-3">
           <div className="flex items-center gap-3">
@@ -283,7 +310,7 @@ export const HttpRequestNode = memo(({ data, selected, id }: NodeProps) => {
         <CustomHandle
           type="source"
           position={Position.Right}
-          className="!border-brand-cyan"
+          portType="json"
         />
       </Card>
     </div>
@@ -311,7 +338,7 @@ export const IfElseNode = memo(({ data, selected, id }: NodeProps) => {
         <CustomHandle
           type="target"
           position={Position.Left}
-          className="!border-brand-rose"
+          portType="any"
         />
 
         <div className="p-3 flex items-center gap-3 border-b border-white/5">

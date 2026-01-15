@@ -1,7 +1,8 @@
 import { memo, useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import type { NodeProps } from '@xyflow/react';
-import type { NodeStatus } from '@ynode/core';
+import type { NodeStatus, PortDataType } from '@ynode/core';
+import { getTypeColor } from '@ynode/core';
 import { useNodeTypesStore } from '../../store/nodeTypesStore';
 import {
   Zap,
@@ -268,19 +269,44 @@ const NodeToolbar = ({ nodeId, selected }: NodeToolbarProps) => {
   );
 };
 
-// Custom handle component
-const CustomHandle = ({ type, position, id, className, style }: any) => (
-  <Handle
-    type={type}
-    position={position}
-    id={id}
-    style={style}
-    className={cn(
-      '!w-3 !h-3 !bg-background !border-2 !border-primary',
-      className
-    )}
-  />
-);
+// Custom handle component with type-based colors
+interface CustomHandleProps {
+  type: 'source' | 'target';
+  position: Position;
+  id?: string;
+  portType?: PortDataType;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const CustomHandle = ({
+  type,
+  position,
+  id,
+  portType = 'any',
+  className,
+  style,
+}: CustomHandleProps) => {
+  const typeColor = getTypeColor(portType);
+
+  return (
+    <Handle
+      type={type}
+      position={position}
+      id={id}
+      style={{
+        ...style,
+        backgroundColor: typeColor,
+        borderColor: typeColor,
+      }}
+      className={cn(
+        '!w-3 !h-3 !border-2',
+        '!shadow-[0_0_6px_currentColor]',
+        className
+      )}
+    />
+  );
+};
 
 /**
  * GenericNode - A dynamic node component that renders any node type
@@ -347,7 +373,7 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
                 type="target"
                 position={Position.Left}
                 id={nodeDef.inputs[0].id}
-                className={`!${colors.border.replace('border-l-', 'border-')}`}
+                portType={nodeDef.inputs[0].type as PortDataType}
               />
             ) : (
               // Multiple inputs - render each with label
@@ -369,11 +395,10 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
                         top: '50%',
                         transform: 'translateY(-50%)',
                         left: '-7px',
+                        backgroundColor: getTypeColor(input.type as PortDataType),
+                        borderColor: getTypeColor(input.type as PortDataType),
                       }}
-                      className={cn(
-                        '!w-3 !h-3 !border-2 !border-background',
-                        colors.bg.replace('/10', '')
-                      )}
+                      className="!w-3 !h-3 !border-2 !shadow-[0_0_6px_currentColor]"
                     />
                   </div>
                 ))}
@@ -408,7 +433,8 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
               <CustomHandle
                 type="source"
                 position={Position.Right}
-                className={`!${colors.border.replace('border-l-', 'border-')}`}
+                id={nodeDef.outputs[0].id}
+                portType={nodeDef.outputs[0].type as PortDataType}
               />
             ) : (
               // Multiple outputs - render each with label
@@ -429,11 +455,10 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
                         top: '50%',
                         transform: 'translateY(-50%)',
                         right: '-7px',
+                        backgroundColor: getTypeColor(output.type as PortDataType),
+                        borderColor: getTypeColor(output.type as PortDataType),
                       }}
-                      className={cn(
-                        '!w-3 !h-3 !border-2 !border-background',
-                        colors.bg.replace('/10', '')
-                      )}
+                      className="!w-3 !h-3 !border-2 !shadow-[0_0_6px_currentColor]"
                     />
                   </div>
                 ))}

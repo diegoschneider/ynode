@@ -13,4 +13,19 @@ export type {
   PortDefinition,
   CategoryMetadata,
   NodeCategory,
+  PortDataType,
+  TypeMetadata,
+  PrimitiveDataType,
+  StructuredDataType,
+  FormatDataType,
+  BinaryDataType,
+  SpecialDataType,
 } from '@ynode/core';
+
+export {
+  TYPE_METADATA,
+  isTypeCompatible,
+  getTypeColor,
+  getCompatibleTypes,
+} from '@ynode/core';
+

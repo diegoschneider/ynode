@@ -7,14 +7,21 @@ import {
   ReactFlowProvider,
   Panel,
 } from '@xyflow/react';
-import type { ReactFlowInstance, Edge } from '@xyflow/react';
+import type { ReactFlowInstance, Edge, EdgeTypes } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkflowStore } from '../../store/workflowStore';
 import { useNodeTypes } from '../nodes/CustomNodes';
+import { TypedEdge } from './TypedEdge';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
+
+// Custom edge types for type-colored connections
+const edgeTypes: EdgeTypes = {
+  default: TypedEdge,
+  typed: TypedEdge,
+};
 
 function CanvasInner() {
   const nodeTypes = useNodeTypes();
@@ -249,10 +256,11 @@ function CanvasInner() {
         onPaneClick={onPaneClick}
         onEdgeClick={onEdgeClick}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{
-          style: { stroke: 'rgba(255, 255, 255, 0.4)', strokeWidth: 2 },
+          type: 'typed',
           animated: false,
         }}
         panOnDrag={[2]}
