@@ -2,3 +2,4 @@ packages:
   - 'packages/*'
   - 'ynode-app'
   - 'ynode-server'
+  - 'ynode-nodes'

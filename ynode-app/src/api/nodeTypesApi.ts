@@ -6,10 +6,10 @@ import type {
 
 const API_BASE = 'http://localhost:3001/api';
 
-// Cache for node types
+// Cache for node types - disabled during development
 let nodeTypesCache: NodeTypesResponse | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 0; // Disabled
 
 /**
  * Fetch all available node types from the server.
