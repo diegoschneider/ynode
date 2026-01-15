@@ -4,6 +4,7 @@
     "type": "module",
     "dependencies": {
         "@ynode/core": "workspace:*",
+        "isolated-vm": "^6.0.2",
         "zod": "^3.24.0"
     }
 }

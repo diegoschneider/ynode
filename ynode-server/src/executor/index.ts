@@ -11,7 +11,6 @@ import { getDecryptedCredential } from '../db/credentials.js';
 import { createMemoryAPI } from '../db/memory.js';
 import { getNodeExecutor } from './nodes';
 import { config } from '../config';
-import { nodeRegistry, validateNodeConfig, ValidationError } from '@ynode/core';
 
 type LogCallback = (log: ExecutionLog) => void;
 type NodeStartCallback = (nodeId: string) => void;

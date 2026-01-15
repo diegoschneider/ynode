@@ -23,7 +23,6 @@
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.6.0",
     "cors": "^2.8.5",
-    "dockerode": "^4.0.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
@@ -39,7 +38,6 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.19",
-    "@types/dockerode": "^3.3.35",
     "@types/express": "^5.0.6",
     "@types/hpp": "^0.2.7",
     "@types/jsonwebtoken": "^9.0.9",
