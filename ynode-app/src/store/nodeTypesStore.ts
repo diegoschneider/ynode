@@ -32,14 +32,14 @@ export const useNodeTypesStore = create<NodeTypesState>((set, get) => ({
   error: null,
 
   // Actions
-  fetchNodeTypes: async (forceRefresh = false) => {
-    // Don't refetch if already loaded (unless forced)
-    if (!forceRefresh && get().isLoaded) return;
+  fetchNodeTypes: async (_forceRefresh = false) => {
+    // Skip only if currently loading
+    if (get().isLoading) return;
 
     set({ isLoading: true, error: null });
 
     try {
-      const data = await fetchNodeTypesApi(forceRefresh);
+      const data = await fetchNodeTypesApi(true); // Always force refresh
       set({
         nodes: data.nodes,
         categories: data.categories,

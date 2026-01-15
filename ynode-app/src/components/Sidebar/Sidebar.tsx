@@ -16,6 +16,13 @@ import {
   Clock,
   Webhook,
   Box,
+  Brain,
+  MessageSquare,
+  Database,
+  Wrench,
+  Sparkles,
+  Send,
+  Type,
   type LucideIcon,
 } from 'lucide-react';
 import { Card } from '../ui/card';
@@ -37,6 +44,13 @@ const iconMap: Record<string, LucideIcon> = {
   Clock,
   Webhook,
   Box,
+  Brain,
+  MessageSquare,
+  Database,
+  Wrench,
+  Sparkles,
+  Send,
+  Type,
 };
 
 const getColorClass = (color: string): string => {

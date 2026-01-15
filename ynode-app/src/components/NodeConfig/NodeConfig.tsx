@@ -1,5 +1,6 @@
 import { useState, useMemo, type DragEvent } from 'react';
 import { useWorkflowStore } from '../../store/workflowStore';
+import { useNodeTypesStore } from '../../store/nodeTypesStore';
 import { Card, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -10,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { nodeRegistry, registerBuiltinNodes, CategoryMeta } from '@ynode/core';
+import { nodeRegistry, CategoryMeta } from '@ynode/core';
 import type { NodeCategory } from '@ynode/core';
 import { Badge } from '../ui/badge';
 import { DynamicConfigPanel, hasCustomConfigPanel } from './DynamicConfigPanel';
@@ -26,11 +27,15 @@ import {
   Shuffle,
   Plug,
   GripVertical,
+  Brain,
+  MessageSquare,
+  Database,
+  Send,
+  Sparkles,
+  Type,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-
-registerBuiltinNodes();
 
 const iconMap: Record<string, LucideIcon> = {
   Zap,
@@ -40,6 +45,12 @@ const iconMap: Record<string, LucideIcon> = {
   GitBranch,
   Shuffle,
   Plug,
+  Brain,
+  MessageSquare,
+  Database,
+  Send,
+  Sparkles,
+  Type,
 };
 
 export const NodeConfig = () => {
@@ -53,12 +64,13 @@ export const NodeConfig = () => {
     null
   );
 
-  const allNodes = useMemo(() => nodeRegistry.getAll(), []);
+  // Use store nodes (includes integration nodes from server)
+  const storeNodes = useNodeTypesStore((state) => state.nodes);
   const categories = Object.keys(CategoryMeta) as NodeCategory[];
 
   const nodeTypes = useMemo(
     () =>
-      allNodes.map((def) => ({
+      storeNodes.map((def) => ({
         type: def.type,
         label: def.label,
         description: def.description || '',
@@ -66,7 +78,7 @@ export const NodeConfig = () => {
         color: def.color || 'zinc-500',
         category: def.category,
       })),
-    [allNodes]
+    [storeNodes]
   );
 
   const filteredNodes = useMemo(() => {
@@ -212,7 +224,9 @@ export const NodeConfig = () => {
     );
   }
 
-  const definition = nodeRegistry.get(selectedNode.type || '');
+  // Get definition from store (dynamic) or fallback to registry (builtin)
+  const storeDefinition = storeNodes.find(n => n.type === selectedNode.type);
+  const definition = storeDefinition || nodeRegistry.get(selectedNode.type || '');
   const config = selectedNode.data.config as Record<string, unknown>;
 
   const handleConfigChange = (key: string, value: unknown) => {

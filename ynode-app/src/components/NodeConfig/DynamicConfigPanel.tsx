@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { NodeDefinition } from '@ynode/core';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import {
@@ -151,14 +150,26 @@ function parseZodField(name: string, schema: any): FieldConfig | null {
 }
 
 interface DynamicConfigPanelProps {
-  definition: NodeDefinition;
+  definition: {
+    configSchema?: unknown;
+    configFields?: Array<{
+      name: string;
+      type: string;
+      required?: boolean;
+      default?: unknown;
+      enumValues?: string[];
+      min?: number;
+      max?: number;
+    }>;
+    credentials?: Array<{ type: string; required?: boolean }>;
+  };
   config: Record<string, unknown>;
   onConfigChange: (key: string, value: unknown) => void;
 }
 
 /**
  * DynamicConfigPanel - Automatically generates configuration UI
- * based on the node's configSchema (Zod schema).
+ * based on the node's configSchema (Zod schema) or configFields (serialized).
  *
  * This enables community developers to create nodes without
  * having to write custom React components for the config panel.
@@ -169,9 +180,28 @@ export function DynamicConfigPanel({
   onConfigChange,
 }: DynamicConfigPanelProps) {
   const fields = useMemo(() => {
-    if (!definition.configSchema) return [];
-    return inferFieldsFromSchema(definition.configSchema);
-  }, [definition.configSchema]);
+    // Prefer pre-parsed configFields (from SerializedNodeDefinition)
+    if (definition.configFields && definition.configFields.length > 0) {
+      return definition.configFields.map((f) => ({
+        name: f.name,
+        label: f.name
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, (str) => str.toUpperCase())
+          .trim(),
+        type: f.type as FieldType,
+        required: f.required ?? true,
+        default: f.default,
+        enumValues: f.enumValues,
+        min: f.min,
+        max: f.max,
+      }));
+    }
+    // Fallback to parsing configSchema (from NodeDefinition)
+    if (definition.configSchema) {
+      return inferFieldsFromSchema(definition.configSchema);
+    }
+    return [];
+  }, [definition.configFields, definition.configSchema]);
 
   if (fields.length === 0) {
     return (
