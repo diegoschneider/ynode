@@ -13,8 +13,7 @@ const KEY_FILE = path.join(process.cwd(), 'data', 'encryption.key');
 
 export function getEncryptionSecret(): string {
   // Check environment variable first
-  const envSecret =
-    process.env.CREDENTIAL_ENCRYPTION_KEY;
+  const envSecret = process.env.CREDENTIAL_ENCRYPTION_KEY;
   if (envSecret) {
     return envSecret;
   }

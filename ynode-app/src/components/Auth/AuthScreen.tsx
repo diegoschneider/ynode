@@ -2,13 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import {
-    Loader2,
-    AlertCircle,
-    ArrowRight,
-    Check,
-    Github,
-} from 'lucide-react';
+import { Loader2, AlertCircle, ArrowRight, Check, Github } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface Particle {

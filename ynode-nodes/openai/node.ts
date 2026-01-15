@@ -103,22 +103,25 @@ export const openaiNode = defineNode<OpenAIConfig>({
 
             log(`Calling OpenAI ${config.model}...`);
 
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${apiKey}`,
-                },
-                body: JSON.stringify({
-                    model: config.model,
-                    messages: [
-                        { role: 'system', content: config.systemPrompt },
-                        { role: 'user', content: prompt },
-                    ],
-                    temperature: config.temperature,
-                    max_tokens: config.maxTokens,
-                }),
-            });
+            const response = await fetch(
+                'https://api.openai.com/v1/chat/completions',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${apiKey}`,
+                    },
+                    body: JSON.stringify({
+                        model: config.model,
+                        messages: [
+                            { role: 'system', content: config.systemPrompt },
+                            { role: 'user', content: prompt },
+                        ],
+                        temperature: config.temperature,
+                        max_tokens: config.maxTokens,
+                    }),
+                }
+            );
 
             if (!response.ok) {
                 const error = await response.text();

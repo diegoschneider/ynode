@@ -43,7 +43,9 @@ export const textNode = defineNode<TextConfig>({
     async execute(ctx: ExecutionContext<TextConfig>): Promise<NodeOutput> {
         const { config, log } = ctx;
 
-        log(`Outputting text: "${config.text.substring(0, 50)}${config.text.length > 50 ? '...' : ''}"`);
+        log(
+            `Outputting text: "${config.text.substring(0, 50)}${config.text.length > 50 ? '...' : ''}"`
+        );
 
         return {
             data: {

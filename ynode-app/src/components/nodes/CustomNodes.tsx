@@ -283,11 +283,7 @@ export const HttpRequestNode = memo(({ data, selected, id }: NodeProps) => {
         )}
       >
         <ExecutionBadge state={nodeData.executionState} />
-        <CustomHandle
-          type="target"
-          position={Position.Left}
-          portType="any"
-        />
+        <CustomHandle type="target" position={Position.Left} portType="any" />
         <div className="p-3 space-y-3">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-md bg-brand-cyan/10 text-brand-cyan">
@@ -307,11 +303,7 @@ export const HttpRequestNode = memo(({ data, selected, id }: NodeProps) => {
             </span>
           </div>
         </div>
-        <CustomHandle
-          type="source"
-          position={Position.Right}
-          portType="json"
-        />
+        <CustomHandle type="source" position={Position.Right} portType="json" />
       </Card>
     </div>
   );
@@ -335,11 +327,7 @@ export const IfElseNode = memo(({ data, selected, id }: NodeProps) => {
         )}
       >
         <ExecutionBadge state={nodeData.executionState} />
-        <CustomHandle
-          type="target"
-          position={Position.Left}
-          portType="any"
-        />
+        <CustomHandle type="target" position={Position.Left} portType="any" />
 
         <div className="p-3 flex items-center gap-3 border-b border-white/5">
           <div className="p-2 rounded-md bg-brand-rose/10 text-brand-rose">

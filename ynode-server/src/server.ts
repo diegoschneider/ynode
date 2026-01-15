@@ -590,7 +590,9 @@ registerBuiltinNodes();
   app.get('/api/workflows/:id/executions', authMiddleware, (req, res) => {
     try {
       const workflowId = getParam(req.params.id);
-      const workflowRow = getWorkflowById(workflowId) as WorkflowRow | undefined;
+      const workflowRow = getWorkflowById(workflowId) as
+        | WorkflowRow
+        | undefined;
 
       if (!workflowRow) {
         return res.status(404).json({ error: 'Workflow not found' });
@@ -601,7 +603,10 @@ registerBuiltinNodes();
       }
 
       const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
-      const rows = getExecutionsByWorkflowId(workflowId, limit) as ExecutionRow[];
+      const rows = getExecutionsByWorkflowId(
+        workflowId,
+        limit
+      ) as ExecutionRow[];
 
       res.json(rows.map(rowToApiExecution));
     } catch (error) {
@@ -684,7 +689,8 @@ registerBuiltinNodes();
               broadcastNodeStart(workflowId, nodeId),
             onNodeComplete: (nodeId: string, success: boolean) =>
               broadcastNodeComplete(workflowId, nodeId, success),
-            onNodeSkip: (nodeId: string) => broadcastNodeSkip(workflowId, nodeId),
+            onNodeSkip: (nodeId: string) =>
+              broadcastNodeSkip(workflowId, nodeId),
             onLog: (log: any) => broadcastLog(workflowId, log),
           },
           inputData,
@@ -799,5 +805,4 @@ registerBuiltinNodes();
 ╚════════════════════════════════════════════════════════════╝
     `);
   });
-
 })();

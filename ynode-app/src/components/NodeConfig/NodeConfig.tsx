@@ -225,8 +225,9 @@ export const NodeConfig = () => {
   }
 
   // Get definition from store (dynamic) or fallback to registry (builtin)
-  const storeDefinition = storeNodes.find(n => n.type === selectedNode.type);
-  const definition = storeDefinition || nodeRegistry.get(selectedNode.type || '');
+  const storeDefinition = storeNodes.find((n) => n.type === selectedNode.type);
+  const definition =
+    storeDefinition || nodeRegistry.get(selectedNode.type || '');
   const config = selectedNode.data.config as Record<string, unknown>;
 
   const handleConfigChange = (key: string, value: unknown) => {

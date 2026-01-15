@@ -13,8 +13,8 @@ export async function loadIntegrationNodes(): Promise<void> {
     }
 
     const folders = readdirSync(YNODE_NODES_DIR, { withFileTypes: true })
-        .filter(d => d.isDirectory() && d.name !== 'node_modules')
-        .map(d => d.name);
+        .filter((d) => d.isDirectory() && d.name !== 'node_modules')
+        .map((d) => d.name);
 
     console.log(`Loading ${folders.length} integration nodes from ynode-nodes/`);
 

@@ -27,9 +27,7 @@ const FREE_MODELS = [
 
 const configSchema = z.object({
     credentialId: z.string().default(''),
-    model: z
-        .enum(FREE_MODELS)
-        .default('mistralai/devstral-2512:free'),
+    model: z.enum(FREE_MODELS).default('mistralai/devstral-2512:free'),
     systemPrompt: z.string().default('You are a helpful assistant.'),
     temperature: z.number().min(0).max(2).default(0.7),
     maxTokens: z.number().min(1).max(16384).default(2048),

@@ -103,8 +103,8 @@ export const useWorkflowDataStore = create<WorkflowDataState>((set, get) => ({
       cache.delete(id);
 
       set({
-        workflows: workflows.filter(w => w.id !== id),
-        workflowCache: cache
+        workflows: workflows.filter((w) => w.id !== id),
+        workflowCache: cache,
       });
     } catch (error) {
       console.error('Failed to delete workflow:', error);

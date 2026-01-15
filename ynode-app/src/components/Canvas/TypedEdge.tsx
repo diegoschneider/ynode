@@ -1,9 +1,5 @@
 import { memo } from 'react';
-import {
-    BaseEdge,
-    getSmoothStepPath,
-    useReactFlow,
-} from '@xyflow/react';
+import { BaseEdge, getSmoothStepPath, useReactFlow } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
 import { getTypeColor, isTypeCompatible } from '../../types/nodeTypes';
 import { useNodeTypesStore } from '../../store/nodeTypesStore';

@@ -73,15 +73,7 @@ export const TYPE_METADATA: Record<PortDataType, TypeMetadata> = {
     color: '#F472B6', // Pink
     description: 'Text value',
     category: 'primitive',
-    compatibleWith: [
-      'string',
-      'any',
-      'markdown',
-      'html',
-      'xml',
-      'yaml',
-      'csv',
-    ],
+    compatibleWith: ['string', 'any', 'markdown', 'html', 'xml', 'yaml', 'csv'],
   },
   number: {
     label: 'Number',
@@ -320,7 +312,6 @@ export interface PortDefinition {
   itemType?: PortDataType; // For arrays (e.g., array of strings)
   schema?: object; // Optional JSON schema for object validation
 }
-
 
 export type NodeCategory =
   | 'trigger'

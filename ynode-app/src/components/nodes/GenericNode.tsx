@@ -385,7 +385,9 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
                   >
                     <span className="text-xs font-medium text-muted-foreground">
                       {input.label}
-                      {input.required && <span className="text-red-400 ml-0.5">*</span>}
+                      {input.required && (
+                        <span className="text-red-400 ml-0.5">*</span>
+                      )}
                     </span>
                     <Handle
                       type="target"
@@ -395,7 +397,9 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
                         top: '50%',
                         transform: 'translateY(-50%)',
                         left: '-7px',
-                        backgroundColor: getTypeColor(input.type as PortDataType),
+                        backgroundColor: getTypeColor(
+                          input.type as PortDataType
+                        ),
                         borderColor: getTypeColor(input.type as PortDataType),
                       }}
                       className="!w-3 !h-3 !border-2 !shadow-[0_0_6px_currentColor]"
@@ -455,7 +459,9 @@ export const GenericNode = memo(({ data, selected, id, type }: NodeProps) => {
                         top: '50%',
                         transform: 'translateY(-50%)',
                         right: '-7px',
-                        backgroundColor: getTypeColor(output.type as PortDataType),
+                        backgroundColor: getTypeColor(
+                          output.type as PortDataType
+                        ),
                         borderColor: getTypeColor(output.type as PortDataType),
                       }}
                       className="!w-3 !h-3 !border-2 !shadow-[0_0_6px_currentColor]"

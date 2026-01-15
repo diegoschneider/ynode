@@ -404,7 +404,11 @@ interface CredentialPickerProps {
   required?: boolean;
 }
 
-function CredentialPicker({ value, onChange, required }: CredentialPickerProps) {
+function CredentialPicker({
+  value,
+  onChange,
+  required,
+}: CredentialPickerProps) {
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -423,7 +427,9 @@ function CredentialPicker({ value, onChange, required }: CredentialPickerProps) 
       </Label>
       <Select value={value || ''} onValueChange={(v) => onChange(v)}>
         <SelectTrigger className="bg-white/5 border-white/10">
-          <SelectValue placeholder={loading ? 'Loading...' : 'Select credential'} />
+          <SelectValue
+            placeholder={loading ? 'Loading...' : 'Select credential'}
+          />
         </SelectTrigger>
         <SelectContent className="bg-zinc-900 border-white/10">
           {credentials.length === 0 && !loading && (

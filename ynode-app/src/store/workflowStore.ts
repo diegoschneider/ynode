@@ -175,9 +175,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       selectedNode:
         get().selectedNode?.id === nodeId
           ? {
-              ...get().selectedNode!,
-              data: { ...get().selectedNode!.data, ...data },
-            }
+            ...get().selectedNode!,
+            data: { ...get().selectedNode!.data, ...data },
+          }
           : get().selectedNode,
       isDirty: true,
     });
@@ -188,23 +188,23 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       nodes: get().nodes.map((node) =>
         node.id === nodeId
           ? {
-              ...node,
-              data: {
-                ...node.data,
-                config: { ...node.data.config, ...config },
-              },
-            }
+            ...node,
+            data: {
+              ...node.data,
+              config: { ...node.data.config, ...config },
+            },
+          }
           : node
       ),
       selectedNode:
         get().selectedNode?.id === nodeId
           ? {
-              ...get().selectedNode!,
-              data: {
-                ...get().selectedNode!.data,
-                config: { ...get().selectedNode!.data.config, ...config },
-              },
-            }
+            ...get().selectedNode!,
+            data: {
+              ...get().selectedNode!.data,
+              config: { ...get().selectedNode!.data.config, ...config },
+            },
+          }
           : get().selectedNode,
       isDirty: true,
     });
@@ -267,10 +267,26 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     }),
 
   loadFromServer: (workflow) => {
+    // Merge saved config with current defaults from node definitions
+    const mergedNodes = workflow.nodes.map((node) => {
+      const nodeType = (node.data?.type || node.type || '') as string;
+      const definition = nodeRegistry.get(nodeType);
+      if (definition && definition.defaultConfig) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            config: { ...definition.defaultConfig, ...node.data?.config },
+          },
+        };
+      }
+      return node;
+    });
+
     set({
       workflowId: workflow.id,
       workflowName: workflow.name,
-      nodes: workflow.nodes,
+      nodes: mergedNodes as Node<NodeData>[],
       edges: workflow.edges,
       isDirty: false,
       saveStatus: 'saved',

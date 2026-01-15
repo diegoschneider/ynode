@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Workflow, Search, Plus, Calendar, ArrowRight, Trash2 } from 'lucide-react';
+import {
+  Workflow,
+  Search,
+  Plus,
+  Calendar,
+  ArrowRight,
+  Trash2,
+} from 'lucide-react';
 import { useWorkflowDataStore } from '@/store/workflowDataStore';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -103,7 +110,11 @@ export function Workflows() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (confirm('Are you sure you want to delete this workflow?')) {
+                      if (
+                        confirm(
+                          'Are you sure you want to delete this workflow?'
+                        )
+                      ) {
                         deleteWorkflow(workflow.id);
                       }
                     }}
