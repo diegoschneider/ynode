@@ -12,15 +12,9 @@ program
 
 program
   .command('create-node <name>')
-  .description('Create a new node from template')
-  .option('-c, --category <category>', 'Node category', 'custom')
-  .option('-o, --output <directory>', 'Output directory', './src/nodes')
+  .description('Create a new node in ynode-nodes/')
+  .option('-c, --category <category>', 'Node category', 'utility')
   .option('--credentials', 'Include credential support template', false)
-  .option(
-    '--internal',
-    'Use relative imports (for ynode-core development)',
-    false
-  )
   .action(createNode);
 
 program

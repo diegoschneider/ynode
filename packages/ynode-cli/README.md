@@ -1,70 +1,69 @@
 # @ynode/cli
 
-CLI tools for creating custom nodes.
+CLI tools for creating custom ynode nodes.
 
 ## Usage
 
-### For ynode-core Contributors (internal)
+```bash
+node packages/ynode-cli/dist/cli.js create-node <name> [options]
+```
+
+## Commands
+
+### `create-node <name>`
+
+Create a new node in `ynode-nodes/<name>/node.ts`.
+
+**Options:**
+
+| Option           | Description                | Default   |
+| ---------------- | -------------------------- | --------- |
+| `-c, --category` | Node category              | `utility` |
+| `--credentials`  | Include credential support | `false`   |
+
+**Example:**
 
 ```bash
-node packages/ynode-cli/dist/cli.js create-node MyNode -c utility -o packages/ynode-core/src/nodes --internal
+# Basic node
+node packages/ynode-cli/dist/cli.js create-node MyNode -c utility
+
+# Node with credential support
+node packages/ynode-cli/dist/cli.js create-node Slack -c communication --credentials
 ```
 
-After creating, open `packages/ynode-core/src/nodes/index.ts` and add these 3 lines:
+**Output:**
 
-```typescript
-// 1. Add import at the top with other imports
-import { myNodeNode } from './my-node';
+```
+Creating node: MyNode
+  Type: my-node
+  Category: utility
+  Output: ynode-nodes/my-node/node.ts
 
-// 2. Add export with other exports
-export { myNodeNode } from './my-node';
+  Node created successfully!
 
-// 3. Add register inside registerBuiltinNodes() function
-nodeRegistry.register(myNodeNode);
+Next steps:
+  1. Edit ynode-nodes/my-node/node.ts to implement your node logic
+  2. Run pnpm --filter @ynode/core build
+  3. Restart ynode-server to load the new node
 ```
 
-Then build:
+### `validate <nodePath>`
+
+Validate a node definition file.
 
 ```bash
-pnpm --filter @ynode/core build
+node packages/ynode-cli/dist/cli.js validate ynode-nodes/my-node/node.ts
 ```
 
-## Full Example
+## Node Categories
 
-Before:
-
-```typescript
-import { getVariableNode } from './getVariable';
-
-export { getVariableNode } from './getVariable';
-
-export function registerBuiltinNodes(): void {
-  // ...
-  nodeRegistry.register(getVariableNode);
-}
-```
-
-After adding `MyNode`:
-
-```typescript
-import { getVariableNode } from './getVariable';
-import { myNodeNode } from './my-node'; // <- ADD
-
-export { getVariableNode } from './getVariable';
-export { myNodeNode } from './my-node'; // <- ADD
-
-export function registerBuiltinNodes(): void {
-  // ...
-  nodeRegistry.register(getVariableNode);
-  nodeRegistry.register(myNodeNode); // <- ADD
-}
-```
-
-## Options
-
-| Option           | Description                             |
-| ---------------- | --------------------------------------- |
-| `-c, --category` | Node category (default: custom)         |
-| `-o, --output`   | Output directory (default: ./src/nodes) |
-| `--credentials`  | Include credential support template     |
-| `--internal`     | Use relative imports (for ynode-core)   |
+| Category        | Description                         |
+| --------------- | ----------------------------------- |
+| `triggers`      | Workflow entry points               |
+| `logic`         | Control flow (if/else, switch)      |
+| `transform`     | Data transformation                 |
+| `integrations`  | HTTP, webhooks, external APIs       |
+| `data`          | Variables, memory, storage          |
+| `ai`            | LLM integrations (OpenAI, etc.)     |
+| `communication` | Messaging (Telegram, Discord, etc.) |
+| `utility`       | General utility nodes               |
