@@ -10,8 +10,6 @@ import { delayNode } from './delay';
 import { jsonTransformNode } from './jsonTransform';
 import { templateNode } from './template';
 import { splitNode } from './split';
-import { setVariableNode } from './setVariable';
-import { getVariableNode } from './getVariable';
 
 export { triggerNode } from './trigger';
 export { httpRequestNode } from './httpRequest';
@@ -24,8 +22,6 @@ export { delayNode } from './delay';
 export { jsonTransformNode } from './jsonTransform';
 export { templateNode } from './template';
 export { splitNode } from './split';
-export { setVariableNode } from './setVariable';
-export { getVariableNode } from './getVariable';
 
 export function registerBuiltinNodes(): void {
   if (nodeRegistry.has('trigger')) {
@@ -43,8 +39,6 @@ export function registerBuiltinNodes(): void {
   nodeRegistry.register(jsonTransformNode);
   nodeRegistry.register(templateNode);
   nodeRegistry.register(splitNode);
-  nodeRegistry.register(setVariableNode);
-  nodeRegistry.register(getVariableNode);
 }
 
 export function getBuiltinNodes() {
@@ -60,7 +54,5 @@ export function getBuiltinNodes() {
     jsonTransformNode,
     templateNode,
     splitNode,
-    setVariableNode,
-    getVariableNode,
   ];
 }
