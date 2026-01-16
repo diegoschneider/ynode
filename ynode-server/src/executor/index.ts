@@ -31,6 +31,20 @@ export interface ExecutionResult {
   completedAt: string;
 }
 
+function findConnectedNodes(
+  nodes: WorkflowNode[],
+  edges: WorkflowEdge[]
+): Set<string> {
+  const connected = new Set<string>();
+
+  edges.forEach((edge) => {
+    connected.add(edge.source);
+    connected.add(edge.target);
+  });
+
+  return connected;
+}
+
 function topologicalSort(
   nodes: WorkflowNode[],
   edges: WorkflowEdge[]
@@ -240,6 +254,42 @@ export async function executeWorkflow(
     };
   }
 
+  const connectedNodeIds = findConnectedNodes(executableNodes, edges);
+  const connectedNodes = executableNodes.filter((node) =>
+    connectedNodeIds.has(node.id)
+  );
+  const orphanNodes = executableNodes.filter(
+    (node) => !connectedNodeIds.has(node.id)
+  );
+
+  if (orphanNodes.length > 0) {
+    wrappedLog({
+      id: uuidv4(),
+      nodeId: 'system',
+      nodeName: 'System',
+      status: 'success',
+      message: `Skipping ${orphanNodes.length} disconnected node(s): ${orphanNodes.map((n) => n.data.label).join(', ')}`,
+      timestamp: startedAt,
+    });
+  }
+
+  if (connectedNodes.length === 0) {
+    wrappedLog({
+      id: uuidv4(),
+      nodeId: 'system',
+      nodeName: 'System',
+      status: 'error',
+      message: 'No connected nodes to execute. Connect your nodes with edges.',
+      timestamp: startedAt,
+    });
+    return {
+      status: 'error',
+      logs,
+      startedAt,
+      completedAt: new Date().toISOString(),
+    };
+  }
+
   wrappedLog({
     id: uuidv4(),
     nodeId: 'system',
@@ -249,7 +299,7 @@ export async function executeWorkflow(
     timestamp: startedAt,
   });
 
-  const sortedNodes = topologicalSort(executableNodes, edges);
+  const sortedNodes = topologicalSort(connectedNodes, edges);
   const nodeOutputs = new Map<string, NodeOutput>();
   const skippedNodes = new Set<string>();
 
