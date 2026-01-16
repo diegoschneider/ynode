@@ -1,13 +1,12 @@
-<h1 align="center">
+<p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="media/logo_white.svg">
-    <img src="media/logo_black.svg" width="42" alt="ynode logo" style="vertical-align: middle;">
+    <source media="(prefers-color-scheme: dark)" srcset="media/logo_white_orange.svg">
+    <img src="media/logo_black.svg" width="48" alt="ynode logo">
   </picture>
-  <span style="vertical-align: middle;">ynode</span>
-</h1>
+</p>
 
 <p align="center">
-  <strong>Open-source visual workflow automation.</strong><br />
+  y<strong>node</strong> is <strong>Open-source visual workflow automation.</strong><br />
   Built for everyone
 </p>
 
@@ -15,7 +14,8 @@
   <a href="#quick-start">Quick Start</a> •
   <a href="packages/ynode-core/README.md">Core</a> •
   <a href="packages/ynode-cli/README.md">CLI</a> •
-  <a href="#license">License</a>
+  <a href="CONTRIBUTING.md">Contributing</a> •
+  <a href="/LICENSE">License</a>
 </p>
 
 <div align="center">
