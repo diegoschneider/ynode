@@ -55,6 +55,10 @@ import {
   getCredentialsByUserId,
   deleteCredential,
 } from './db/credentials.js';
+import {
+  getAllWorkflowMemory,
+  deleteMemory as deleteWorkflowMemory,
+} from './db/memory.js';
 import { executeWorkflow } from './executor/index.js';
 import {
   registerBuiltinNodes,
@@ -774,6 +778,63 @@ registerBuiltinNodes();
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: 'Failed to delete credential' });
+    }
+  });
+
+  /**
+   * GET /api/workflows/:id/memory
+   * Returns all memory entries for a workflow.
+   */
+  app.get('/api/workflows/:id/memory', authMiddleware, (req, res) => {
+    try {
+      const workflowId = getParam(req.params.id);
+      const workflowRow = getWorkflowById(workflowId) as
+        | WorkflowRow
+        | undefined;
+
+      if (!workflowRow) {
+        return res.status(404).json({ error: 'Workflow not found' });
+      }
+
+      if (workflowRow.user_id !== req.userId) {
+        return res.status(403).json({ error: 'Not authorized' });
+      }
+
+      const entries = getAllWorkflowMemory(workflowId);
+
+      res.json({ entries, count: entries.length });
+    } catch (error) {
+      console.error('GET /api/workflows/:id/memory error:', error);
+      res.status(500).json({ error: 'Failed to fetch memory' });
+    }
+  });
+
+  /**
+   * DELETE /api/workflows/:id/memory/:key
+   * Delete a specific memory entry.
+   */
+  app.delete('/api/workflows/:id/memory/:key', authMiddleware, (req, res) => {
+    try {
+      const workflowId = getParam(req.params.id);
+      const key = getParam(req.params.key);
+      const workflowRow = getWorkflowById(workflowId) as
+        | WorkflowRow
+        | undefined;
+
+      if (!workflowRow) {
+        return res.status(404).json({ error: 'Workflow not found' });
+      }
+
+      if (workflowRow.user_id !== req.userId) {
+        return res.status(403).json({ error: 'Not authorized' });
+      }
+
+      const deleted = deleteWorkflowMemory(workflowId, null, key);
+
+      res.json({ success: deleted, key });
+    } catch (error) {
+      console.error('DELETE /api/workflows/:id/memory/:key error:', error);
+      res.status(500).json({ error: 'Failed to delete memory entry' });
     }
   });
 

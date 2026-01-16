@@ -131,6 +131,38 @@ export function cleanupExpiredMemory(): number {
   return result.changes;
 }
 
+export interface WorkflowMemoryEntry {
+  key: string;
+  value: unknown;
+  nodeId: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function getAllWorkflowMemory(workflowId: string): WorkflowMemoryEntry[] {
+  const rows = db
+    .prepare(
+      `
+        SELECT key, value, node_id, expires_at, created_at, updated_at 
+        FROM workflow_memory 
+        WHERE workflow_id = ?
+        AND (expires_at IS NULL OR expires_at > datetime('now'))
+        ORDER BY updated_at DESC
+    `
+    )
+    .all(workflowId) as MemoryRow[];
+
+  return rows.map((row) => ({
+    key: row.key,
+    value: JSON.parse(row.value),
+    nodeId: row.node_id,
+    expiresAt: row.expires_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }));
+}
+
 export function createMemoryAPI(workflowId: string, nodeId: string | null) {
   return {
     get: async (key: string): Promise<unknown> => {
