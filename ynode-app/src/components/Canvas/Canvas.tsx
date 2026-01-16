@@ -14,6 +14,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWorkflowStore } from '../../store/workflowStore';
 import { useNodeTypes } from '../nodes/CustomNodes';
 import { TypedEdge } from './TypedEdge';
+import { NodePickerOverlay } from './NodePickerOverlay';
 import { RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 
@@ -295,6 +296,9 @@ function CanvasInner() {
           </Button>
         </Panel>
       </ReactFlow>
+
+      {/* Node picker overlay - rendered outside ReactFlow to appear above nodes */}
+      <NodePickerOverlay />
     </div>
   );
 }

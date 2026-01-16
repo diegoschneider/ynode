@@ -63,6 +63,7 @@ interface WorkflowState {
   clearWorkflow: () => void;
   deleteSelectedNodes: () => void;
   deleteEdge: (edgeId: string) => void;
+  insertNodeBetweenEdge: (edgeId: string, nodeType: string) => void;
 
   markDirty: () => void;
   markClean: () => void;
@@ -319,7 +320,47 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   },
 
   deleteEdge: (edgeId) => {
-    set({ edges: get().edges.filter((e) => e.id !== edgeId) });
+    set({ edges: get().edges.filter((e) => e.id !== edgeId), isDirty: true });
+  },
+
+  insertNodeBetweenEdge: (edgeId, nodeType) => {
+    const { nodes, edges } = get();
+    const edge = edges.find((e) => e.id === edgeId);
+    if (!edge) return;
+
+    const sourceNode = nodes.find((n) => n.id === edge.source);
+    const targetNode = nodes.find((n) => n.id === edge.target);
+    if (!sourceNode || !targetNode) return;
+
+    const midX = (sourceNode.position.x + targetNode.position.x) / 2;
+    const midY = (sourceNode.position.y + targetNode.position.y) / 2;
+
+    const newNodeId = uuidv4();
+    const newNode: Node<NodeData> = {
+      id: newNodeId,
+      type: nodeType,
+      position: { x: midX, y: midY },
+      data: getDefaultNodeData(nodeType),
+    };
+
+    const newEdge1: Edge = {
+      id: uuidv4(),
+      source: edge.source,
+      target: newNodeId,
+      sourceHandle: edge.sourceHandle,
+    };
+    const newEdge2: Edge = {
+      id: uuidv4(),
+      source: newNodeId,
+      target: edge.target,
+      targetHandle: edge.targetHandle,
+    };
+
+    set({
+      nodes: [...nodes, newNode],
+      edges: edges.filter((e) => e.id !== edgeId).concat([newEdge1, newEdge2]),
+      isDirty: true,
+    });
   },
 
   copySelectedNodes: () => {
